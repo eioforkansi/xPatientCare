@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Documentation
+{% endblock title %}
+
+{% block body %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      {{message}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="container mt-3">
+  <div class="card">
+    <h5 class="card-header">Record ID {{documentation.record_id}} </h5>
+    <div class="card-body">
+      <a href="/prescription/query " class="btn btn-primary">Back</a>
+
+      <h5 class="card-title text-center">Confidential</h5>
+      <p class="card-text"><strong>Patient ID: </strong> </p>
+
+      <p class="card-text"><strong>Signed by: </strong> </p>
+      
+    </div>
+  </div>
+</div>
+
+{% endblock body %}

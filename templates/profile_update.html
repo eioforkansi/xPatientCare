@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{current_user.name}}
+{% endblock title %}
+
+{% block body %}
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <br>
+      <h3 class="text-center text-bg-success rounded"><span class="badge">Update Profile</span></h3>
+      <br>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form class="row g-3" action="/profile/update/{{user.id}}" method="post">
+        <div class="col-12">
+        <div class="col-12">
+          <label for="first_name" class="form-label">First name</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" value="{{user.first_name}}">
+        </div>
+        <div class="col-12">
+          <label for="middle_name" class="form-label">Middle name</label>
+          <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{user.middle_name}}">
+        </div>
+        <div class="col-12">
+          <label for="last_name" class="form-label">Last name</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" value="{{user.last_name}}">
+        </div>
+        <div class="col-12">
+          <label for="gender" class="form-label">Gender</label>
+          <select id="gender" class="form-select" name="gender" value="{{user.gender}}">
+            <option value="" {% if not user.gender %}selected{% endif %}>Choose Gender</option>
+            <option value="Male" {% if user.gender == "Male" %}selected{% endif %}>Male</option>
+            <option value="Female" {% if user.gender == "Female" %}selected{% endif %}>Female</option>
+            <option value="Others" {% if user.gender == "Others" %}selected{% endif %}>Others</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="patient_id" class="form-label">User ID</label>
+          <input type="number" class="form-control" id="patient_id" placeholder="+234" name="patient_id" value="{{user.id}}">
+        </div>
+        <div class="col-12">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" value="{{user.email}}" name="email">
+        </div>
+        <div class="col-12">
+          <label for="contact_number" class="form-label">Phone Number</label>
+          <input type="text" class="form-control" id="contact_number" placeholder="+234" name="contact_number" value="{{user.contact_number}}">
+        </div>
+        <div class="col-12">
+          <label for="address" class="form-label">Address</label>
+          <input type="text" class="form-control" id="address" placeholder="1234 Main Street" name="address" value="{{user.address}}">
+        </div>
+        <div class="col-12">
+          <label for="date_of_birth" class="form-label">Date of Birth</label>
+          <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{user.date_of_birth}}">
+        </div>
+        <div class="col-12">
+          <label for="emergency_contact_name" class="form-label">Emergency Contact Name</label>
+          <input type="text" class="form-control" id="emergency_contact_name" name="emergency_contact_name" value="{{user.emergency_contact_name}}">
+        </div>
+        <div class="col-12">
+          <label for="emergency_contact_number" class="form-label">Emergency Contact No</label>
+          <input type="text" class="form-control" id="emergency_contact_number" name="emergency_contact_number" value="{{user.emergency_contact_number}}">
+        </div>
+        <div class="col-12">
+          <label for="medical_history" class="form-label">Medical History </label>
+          <input type="text" class="form-control" id="medical_history" name="medical_history" value="{{user.medical_history}}">
+        </div>
+        <div class="col-12">
+          <label for="allergies" class="form-label">Allergies </label>
+          <input type="text" class="form-control" id="allergies" name="allergies" value="{{user.allergies}}">
+        </div>
+
+        <div class="col-12 d-grid gap-2 mb-3 mt-3">
+          <button class="btn btn-success" type="submit">Update</button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+
+</div>
+{% endblock body %}

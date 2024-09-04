@@ -1,0 +1,451 @@
+#!/usr/bin/python3
+
+from flask import Flask, render_template, jsonify, request, session, redirect, url_for, flash
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import desc
+from flask_login import UserMixin, login_user, logout_user, login_manager
+from flask_login import LoginManager, login_required, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import db, User, Bookings, Records, Medications, Documentations
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/eioforkansi/workshop/databases/xPatientCare.db'
+app.secret_key = 'xpatientcare'
+
+# Unique user access
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+db.init_app(app)
+
+@app.before_request
+def create_tables():
+    db.create_all()
+
+@login_manager.unauthorized_handler
+def unauthorized_user():
+    flash('You need to be logged in to access this page.', 'warning')
+    return redirect(url_for('login'))
+
+@app.route("/", methods=['GET'])
+@app.route("/home",  methods=['GET'])
+def home():
+    return render_template('home.html')
+
+@app.route("/professionals")
+@login_required
+def professionals():
+    return render_template('professionals.html')
+
+@app.route("/profile/<int:user_id>")
+@login_required
+def profile(user_id):
+    user=User.query.filter_by(id=user_id).first()
+    return render_template('profile.html', user=user)
+
+@app.route("/profile/update/<int:user_id>", methods=['POST', 'GET'])
+@login_required
+def profile_update(user_id):
+    user=User.query.filter_by(id=user_id).first()
+    if request.method == "POST":
+        # user.title = request.form["title"]
+        user.first_name = request.form["first_name"]
+        user.middle_name = request.form["middle_name"]
+        user.last_name = request.form["last_name"]
+        user.email = request.form["email"]
+        user.date_of_birth = request.form["date_of_birth"]
+        user.gender = request.form["gender"]
+        user.address = request.form["address"]
+        user.contact_number = request.form["contact_number"]
+        user.emergency_contact_name = request.form["emergency_contact_name"]
+        user.emergency_contact_number = request.form["emergency_contact_number"]
+        user.medical_history = request.form["medical_history"]
+        user.allergies = request.form["allergies"]
+        db.session.commit()
+        flash("Profile updated successful", "success")
+        return redirect(url_for('profile', user_id=user_id))
+    return render_template('profile_update.html', user=user)
+
+@app.route("/profile/update/role/<int:user_id>", methods=['POST', 'GET'])
+@login_required
+def role_update(user_id):
+    user=User.query.filter_by(id=user_id).first()
+    if request.method == "POST":
+        user.title = request.form["title"]
+        user.user_role = request.form["user_role"]
+        authorization_code = request.form.get('authorization_code')
+        user=User.query.get(user_id)
+        if user and authorization_code == "0000":
+            db.session.commit()
+            flash("Profile role updated successful", "success")
+            return redirect(url_for('profile', user_id=user_id))
+        else:
+            flash("Invalid authorization code", "warning")
+    return render_template('role_update.html', user=user)
+
+@app.route("/bookings", methods=['POST', 'GET'])
+@login_required
+def bookings():
+    if request.method == "POST":
+        title = request.form.get("title")
+        first_name = request.form.get("first_name")
+        middle_name = request.form.get("middle_name")
+        last_name = request.form.get("last_name")
+        email = request.form.get("email")
+        number = request.form.get("number")
+        gender = request.form.get("gender")
+        user_id = request.form.get("user_id")
+        address = request.form.get("address")
+        city = request.form.get("city")
+        state = request.form.get("state")
+        hospital = request.form.get("hospital")
+        department = request.form.get("department")
+        date = request.form.get("date")
+        time = request.form.get("time")
+        reason = request.form.get("reason")
+        booking_status = request.form.get("booking_status")
+        new_booking = Bookings(title=title, first_name=first_name, middle_name=middle_name, last_name=last_name,
+                               email=email, number=number, gender=gender, user_id=user_id, address=address, city=city, state=state, hospital=hospital,
+                               department=department, date=date, time=time, reason=reason, booking_status=booking_status)
+        db.session.add(new_booking)
+        db.session.commit()
+        flash("Booking successful", "success")
+        return redirect(url_for('bookings'))
+        
+    return render_template('bookings.html')
+
+@app.route('/booking/detail/view/<int:id>')
+@login_required
+def booking_detail(id):
+    booking = Bookings.query.get_or_404(id)
+    
+    return render_template('booking_detail.html', booking=booking)
+
+@app.route('/booking/schedule/<int:booking_id>')
+@login_required
+def schedule_booking(booking_id):
+    booking = Bookings.query.get_or_404(booking_id)
+    booking.booking_status = "Scheduled"
+    db.session.commit()
+    flash("Booking scheduled successfully", "success")
+    return redirect(url_for("appointments"))
+    
+@app.route('/booking/cancel/<int:booking_id>')
+@login_required
+def cancel_booking(booking_id):
+    booking = Bookings.query.get_or_404(booking_id)
+    booking.booking_status = "Cancelled"
+    db.session.commit()
+    flash("Booking cancelled successfully", "success")
+    return redirect(url_for("appointments"))
+    
+@app.route('/booking/edit/<int:id>', methods=['POST', 'GET'])
+@login_required
+def edit_booking(id):
+    booking = Bookings.query.get_or_404(id)
+    if request.method == "POST":
+        booking.title = request.form["title"]
+        booking.first_name = request.form["first_name"]
+        booking.middle_name = request.form["middle_name"]
+        booking.number = request.form["number"]
+        booking.last_name = request.form["last_name"]
+        booking.email = request.form["email"]
+        booking.gender = request.form["gender"]
+        booking.address = request.form["address"]
+        booking.city = request.form["city"]
+        booking.state = request.form["state"]
+        booking.hospital = request.form["hospital"]
+        booking.department = request.form["department"]
+        booking.date = request.form["date"]
+        booking.time = request.form["time"]
+        booking.reason = request.form["reason"]
+        db.session.commit()
+        flash("Booking updated successful", "success")
+        return redirect(url_for('booking_detail', id=id))
+    return render_template('edit_booking.html', booking=booking)
+
+@app.route('/booking/delete/<int:booking_id>')
+@login_required
+def delete_booking(booking_id):
+    booking = Bookings.query.get_or_404(booking_id)
+    db.session.delete(booking)
+    db.session.commit()
+    flash("Booking deleted successful", "success")
+    return redirect(url_for("appointments"))
+
+@app.route('/documentations/new/create/<int:id>', methods=['POST', 'GET'])
+@login_required
+def create_document(id):
+    record = Records.query.get(id)
+    if request.method == "POST":
+        record_id = request.form.get("record_id")
+        documentation = request.form.get("documentation")
+        documentation_by = request.form.get("documentation_by")
+        new_documentation = Documentations(record_id=record_id, documentation=documentation,
+                                           documentation_by=documentation_by)
+        db.session.add(new_documentation)
+        db.session.commit()
+        flash("Document created successfully", "success")
+        return redirect(url_for("record_detail", record_id=record_id))
+    return render_template('new_documentation.html', record=record)
+
+@app.route('/documentations/delete/<int:id>')
+@login_required
+def delete_documentations(id):
+    documentation = Documentations.query.get_or_404(id)
+    record_id = documentation.record_id
+    db.session.delete(documentation)
+    db.session.commit()
+    flash("Document deleted successful", "success")
+    return redirect(url_for("record_detail", record_id=record_id))
+
+@app.route("/documentation/detail/<int:id>")
+@login_required
+def documentation_detail(id):
+    
+    documentation = Documentations.query.get(id)
+    print("Working...")
+    return render_template('documentation_detail.html',  documentation=documentation)
+
+
+@app.route("/appointments")
+@login_required
+def appointments():
+    # bookings = Bookings.query.filter_by(email=current_user.email).all()
+    bookings = Bookings.query.all()
+    return render_template('appointments.html', bookings=bookings)
+
+@app.route("/records/query", methods=['POST', 'GET'])
+@login_required
+def query_records():
+    if request.method == "POST":
+        id = request.form.get('query')
+        user=User.query.filter_by(id=id).first()
+        if not user:
+            flash(f"Medical records not found", "danger")
+            return redirect(url_for("query_records"))
+        flash("Medical records found succussfully", "success")
+        return redirect(url_for('patient_records', id=id))
+    return render_template('query_records.html')
+
+@app.route("/records/patient/<int:id>", methods=['POST', 'GET'])
+@login_required
+def patient_records(id):
+        user=User.query.filter_by(id=id).first()
+        records=Records.query.filter_by(user_id=id).order_by(desc(Records.created_at)).all()
+        return render_template('patient_records.html', records=records, id=id, user=user)
+
+@app.route("/records/patient/delete/<int:record_id>")
+@login_required
+def delete_record(record_id):         
+    record = Records.query.get(record_id)
+    user_id = record.user_id
+    user=User.query.filter_by(id=user_id).first()
+    records=Records.query.filter_by(user_id=user_id).order_by(desc(Records.created_at)).all()
+    medications = Medications.query.filter_by(record_id=record_id).all()
+    for medication in medications:
+        db.session.delete(medication)
+    db.session.delete(record)
+    db.session.commit()
+    flash("Record deleted successful", "success")
+    return redirect(url_for('patient_records', records=records, id=user_id, user=user))
+
+@app.route("/records/patient/biodata/update/<int:user_id>", methods=['POST', 'GET'])
+@login_required
+def biodata_update(user_id):
+    user=User.query.filter_by(id=user_id).first()
+    if request.method == "POST":
+        user.title = request.form["title"]
+        user.first_name = request.form["first_name"]
+        user.middle_name = request.form["middle_name"]
+        user.last_name = request.form["last_name"]
+        user.email = request.form["email"]
+        user.date_of_birth = request.form["date_of_birth"]
+        user.gender = request.form["gender"]
+        user.address = request.form["address"]
+        user.contact_number = request.form["contact_number"]
+        user.emergency_contact_name = request.form["emergency_contact_name"]
+        user.emergency_contact_number = request.form["emergency_contact_number"]
+        user.medical_history = request.form["medical_history"]
+        user.allergies = request.form["allergies"]
+        db.session.commit()
+        flash("Patient Bio Data updated successfully", "success")
+        return redirect(url_for('patient_records', user_id=user_id))
+    return render_template('biodata_update.html', user=user)
+
+@app.route("/records/patient/update/<int:record_id>", methods=['POST', 'GET'])
+@login_required
+def update_record(record_id):
+    record=Records.query.filter_by(id=record_id).first()
+    medications=Medications.query.filter_by(record_id=record_id).all()
+    if request.method == "POST":
+        record.patient_id = request.form["patient_id"]
+        record.date_of_visit = request.form["date_of_visit"]
+        record.review = request.form["review"]
+        record.physician_name = request.form["physician_name"]
+        record.diagnosis = request.form["diagnosis"]
+        record.plan = request.form["plan"]
+        record.follow_up_date = request.form["follow_up_date"]
+        db.session.commit()
+        flash("Patient record updated successfully", "success")
+        return redirect(url_for('record_detail', record_id=record_id))
+
+    return render_template('update_record.html', record=record)
+
+@app.route('/records/new/create/<int:id>', methods=['POST', 'GET'])
+def create_record(id):
+    user=User.query.filter_by(id=id).first()
+    if request.method == "POST":
+        user_id = request.form.get("user_id")
+        date_of_visit = request.form.get("date_of_visit")
+        review = request.form.get("review")
+        physician_name = request.form.get("physician_name")
+        diagnosis = request.form.get("diagnosis")
+        plan = request.form.get("plan")
+        follow_up_date = request.form.get("follow_up_date")
+        new_record = Records(user_id=user_id, date_of_visit=date_of_visit, review=review, physician_name=physician_name,
+                             diagnosis=diagnosis, plan=plan, follow_up_date=follow_up_date)
+        db.session.add(new_record)
+        db.session.commit()
+        flash("Record created successfully", "success")
+        return redirect(url_for('patient_records', id=id))
+    return render_template('new_record.html', user=user)
+        
+@app.route("/record/detail/<int:record_id>")
+@login_required
+def record_detail(record_id):
+    record = Records.query.filter_by(id=record_id).first()
+    medications = Medications.query.filter_by(record_id=record_id).all()
+    documentations = Documentations.query.filter_by(record_id=record_id).all()
+    return render_template('record_detail.html', record=record, medications=medications, documentations=documentations)
+
+@app.route("/prescription/detail/<int:record_id>")
+@login_required
+def prescription_detail(record_id):
+    record=Records.query.filter_by(id=record_id).first()
+    medications=Medications.query.filter_by(record_id=record_id).all()
+    return render_template('prescription_detail.html',  record=record, medications=medications)
+
+@app.route("/prescription/delete/medication/<int:medication_id>")
+@login_required
+def delete_medication(medication_id):         
+    medication = Medications.query.get(medication_id)
+    record_id = medication.record_id
+    db.session.delete(medication)
+    db.session.commit()
+    flash("Medication deleted successful", "success")
+    return redirect(url_for("prescription_detail", record_id=record_id))
+
+@app.route("/prescription/add/medication/<int:record_id>", methods=['POST'])
+@login_required
+def add_medication(record_id):
+    if request.method == "POST":
+        record_id = request.form.get("record_id")
+        dosage_form = request.form.get("dosage_form")
+        medication_name = request.form.get("medication_name")
+        frequency = request.form.get("frequency")
+        duration = request.form.get("duration")
+        prescribed_by = request.form.get("prescribed_by")
+        dispensed_by = request.form.get("dispensed_by")
+        created_at = request.form.get("created_at")
+        updated_at = request.form.get("updated_at")
+        new_med = Medications(record_id=record_id, dosage_form=dosage_form, medication_name=medication_name, frequency=frequency,
+                              duration=duration, prescribed_by=prescribed_by, dispensed_by=dispensed_by, created_at=created_at, updated_at=updated_at)
+        db.session.add(new_med)
+        db.session.commit()
+        flash("Medication added successfully", "success")
+        return redirect(url_for('prescription_detail',  record_id=record_id))
+
+@app.route("/prescription/query", methods=['POST', 'GET'])
+@login_required
+def query_prescriptions():
+    if request.method == "POST":
+        id = request.form.get('query')
+        record=Records.query.filter_by(id=id).first()
+        medications=Medications.query.filter_by(record_id=id).all()       
+        if not record:
+            flash("Medical records not found", "danger")
+            return redirect(url_for("query_prescriptions"))
+        flash("Records found succussfully", "success")
+        return redirect(url_for('view_prescription', record_id=id))
+    return render_template('query_prescriptions.html')
+
+@app.route("/prescription/view/detail/<int:record_id>")
+@login_required
+def view_prescription(record_id):
+    record=Records.query.filter_by(id=record_id).first()
+    medications=Medications.query.filter_by(record_id=record_id).all()
+    return render_template('view_prescription.html', record=record, medications=medications)
+
+@app.route('/prescription/medication/dispense/<int:id>')
+def dispense_medication(id):
+    medication = Medications.query.get_or_404(id)
+    medication.dispensed_by = current_user.title + " " + current_user.first_name + " " + current_user.last_name
+    record_id = medication.record_id
+    db.session.commit()
+    flash("Medication dispensed successfully", "success")
+    return redirect(url_for('record_detail', record_id=record_id))
+
+@app.route("/signup", methods=['POST', 'GET'])
+def signup():
+    if request.method == "POST":
+        title = request.form.get('title')
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        password = generate_password_hash(request.form.get('password'))
+        
+        user=User.query.filter_by(email=email).first()
+        if user:
+            flash("Email already exist", "warning")
+            return render_template('signup.html')
+        new_user=User(title=title, first_name=first_name, last_name=last_name, email=email, password=password)
+        db.session.add(new_user)
+        db.session.commit()
+        flash("Sign up successful, please login", "success")
+        return render_template('login.html')
+
+    return render_template('signup.html')
+
+@app.route("/login", methods=['POST', 'GET'])
+def login():
+    if request.method == "POST":
+        email = request.form.get('email')
+        password = request.form.get('password')
+        user=User.query.filter_by(email=email).first()
+        if user and check_password_hash(user.password, password):
+            login_user(user)
+            flash("Login successful", "success")
+            return redirect(url_for('home'))
+        else:
+            flash("Incorrect email or password", "warning")
+            return render_template('login.html')
+
+    return render_template('login.html')
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("Logout successful", "success")
+    return render_template('login.html')
+
+@app.route("/api")
+def test():
+    # users = User.query.all()
+    # return jsonify([{'id': user.id, 'name': user.first_name + " " + user.last_name, 'email': user.email} for user in users])
+    # bs = Bookings.query.all()
+    # return jsonify([{ 'id' : b.id, 'title' : b.title, 'first_name' : b.first_name, 'middle_name' : b.middle_name, 'last_name' : b.last_name,
+    #                            'gender' : b.gender, 'email' : b.email, 'address' : b.address, 'city' : b.city, 'state' : b.state, 'hospital' : b.hospital,
+    #                            "department" : b.department, "date" : b.date, "time" : b.time, 'reason' : b.reason} for b in bs])
+    records = Medications.query.all()
+    return jsonify([{'id': record.id, 'record_id': record.record_id} for record in records])
+
+if __name__ == "__main__":
+    # with app.app_context():
+    #     db.create_all()
+    app.run(debug=True)

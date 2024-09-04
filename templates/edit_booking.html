@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Edit Bookings
+{% endblock title %}
+
+{% block body %}
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <br>
+      <h3 class="text-center text-bg-success rounded"><span class="badge">Edit Bookings</span></h3>
+      <br>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <form class="row g-3" action="/booking/edit/{{booking.id}}" method="post">
+        <div class="col-12">
+          <div class="col-md-6">
+            <label for="title" class="form-label" >Title</label>
+            <input type="text" class="form-control" id="title" value="{{booking.title}}" placeholder="Dr, Engr, Mr, Mrs" name="title">
+          </div>
+        </div>
+        <div class="col-12">
+          <label for="first_name" class="form-label">First name</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" value="{{booking.first_name}}">
+        </div>
+        <div class="col-12">
+          <label for="middle_name" class="form-label">Middle name</label>
+          <input type="text" class="form-control" id="middle_name" name="middle_name" value="{{booking.middle_name}}">
+        </div>
+        <div class="col-12">
+          <label for="last_name" class="form-label">Last name</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" value="{{booking.last_name}}">
+        </div>
+        <div class="col-12">
+          <label for="gender" class="form-label">Gender</label>
+          <select id="gender" class="form-select" name="gender" value="{{booking.gender}}">
+            <option value="" {% if not booking.gender %}selected{% endif %}>Choose Gender</option>
+            <option value="Male" {% if booking.gender == "Male" %}selected{% endif %}>Male</option>
+            <option value="Female" {% if booking.gender == "Female" %}selected{% endif %}>Female</option>
+            <option value="Others" {% if booking.gender == "Others" %}selected{% endif %}>Others</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="user_id" class="form-label">User ID</label>
+          <input type="number" class="form-control" id="user_id" placeholder="+234" name="user_id" value="{{booking.user_id}}">
+        </div>
+        <div class="col-12">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" value="{{booking.email}}" name="email">
+        </div>
+        <div class="col-12">
+          <label for="number" class="form-label">Phone Number</label>
+          <input type="number" class="form-control" id="number" placeholder="+234" name="number" value="{{booking.number}}">
+        </div>
+        <div class="col-12">
+          <label for="address" class="form-label">Address</label>
+          <input type="text" class="form-control" id="address" placeholder="1234 Main Street" name="address" value="{{booking.address}}">
+        </div>
+        <div class="col-12">
+          <label for="city" class="form-label">City</label>
+          <input type="text" class="form-control" id="city" name="city" value="{{booking.city}}">
+        </div>
+        <div class="col-12">
+          <label for="state" class="form-label">State</label>
+          <select id="state" class="form-select" name="state" value="{{booking.state}}" required>
+            <option {% if not booking.state %}selected{% endif %}>Choose State</option>
+            <option value="Abuja" {% if booking.state == "Abuja" %}selected{% endif %}>Abuja</option>
+            <option value="Anambra" {% if booking.state == "Anambra" %}selected{% endif %}>Anambra</option>
+            <option value="Lagos" {% if booking.state == "Lagos" %}selected{% endif %}>Lagos</option>
+            <option value="Sokoto" {% if booking.state == "Sokoto" %}selected{% endif %}>Sokoto</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="hospital" class="form-label">Hospital</label>
+          <select id="hospital" class="form-select" name="hospital" value="{{booking.hospital}}" required>
+            <option {% if not booking.hospital %}selected{% endif %}>Choose Hospital</option>
+            <option value="National Hospital Abuja" {% if booking.hospital == "National Hospital Abuja" %}selected{% endif %}>National Hospital Abuja</option>
+            <option value="Usmanu Danfodiyo University Teaching Hospital, Sokoto" {% if booking.hospital == "Usmanu Danfodiyo University Teaching Hospital, Sokoto" %}selected{% endif %}>Usmanu Danfodiyo University Teaching Hospital, Sokoto</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="department" class="form-label">Department</label>
+          <select id="department" class="form-select" name="department" required>
+            <option value="" {% if not booking.department %}selected{% endif %}>Choose Department</option>
+            <option value="Emergency" {% if booking.department == 'Emergency' %}selected{% endif %}>Emergency</option>
+            <option value="Pediatric" {% if booking.department == 'Pediatric' %}selected{% endif %}>Pediatric</option>
+            <option value="Pharmacy" {% if booking.department == 'Pharmacy' %}selected{% endif %}>Pharmacy</option>
+            <option value="Laboratory" {% if booking.department == 'Laboratory' %}selected{% endif %}>Laboratory</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label for="date" class="form-label">Date</label>
+          <input type="date" class="form-control" id="date" name="date" value="{{booking.date}}">
+        </div>
+        <div class="col-12">
+          <label for="time" class="form-label">Time</label>
+          <input type="time" class="form-control" id="time" name="time" value="{{booking.time}}">
+        </div>
+        <div class="col-12">
+          <label for="reasons" class="form-label">Reasons</label>
+          <textarea class="form-control" id="reasons" rows="3" name="reason" placeholder="Briefly write your complains here.">{{booking.reason}}</textarea>
+          <div id="reasons" class="form-text">We'll never share your details with anyone else.</div>
+        </div>
+        <div class="col-12 d-grid gap-2 mb-3 mt-3">
+          <button class="btn btn-success" type="submit">Update</button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+
+</div>
+{% endblock body %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {{current_user.name}}
+{% endblock title %}
+
+{% block body %}
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <br>
+      <h3 class="text-center text-bg-success rounded"><span class="badge">New Record</span></h3>
+      
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+      <a href="/records/patient/{{user.id}}" class="btn btn-primary mt-2 mb-2">Back to records</a>
+
+      <form class="row g-3" action="/records/new/create/{{user.id}}" method="post">    
+        <div class="col-12">
+          <label for="user_id" class="form-label">User ID</label>
+          <input type="number" class="form-control" id="user_id" placeholder="012345" name="user_id" value="{{user.id}}">
+        </div>
+        <div class="col-12">
+          <label for="date" class="form-label">Date</label>
+          <input type="date" class="form-control" id="date" name="date_of_visit" >
+        </div>
+        <div class="col-12">
+          <label for="review" class="form-label">Review</label>
+          <textarea class="form-control" id="review" rows="3" name="review" placeholder="Clerkship documentation here."></textarea>
+          <div id="reasons" class="form-text">Keep patients information confidential.</div>
+        </div>
+        <div class="col-12">
+          <label for="physician_name" class="form-label">Physician Name</label>
+          <input type="text" class="form-control" id="physician_name" name="physician_name" value="{{current_user.title}} {{current_user.first_name}} {{current_user.last_name}}">
+        </div>
+        <div class="col-12">
+          <label for="diagnosis" class="form-label">Diagnosis</label>
+          <textarea class="form-control" id="diagnosis" rows="3" name="diagnosis" placeholder="Write diagnosis here."></textarea>
+        </div>
+        <div class="col-12">
+          <label for="plan" class="form-label">Plan</label>
+          <textarea class="form-control" id="plan" rows="3" name="plan" placeholder="Write plan here."></textarea>
+        </div>
+        <div class="col-12">
+          <label for="follow_up_date" class="form-label">Follow up date </label>
+          <input type="date" class="form-control" id="follow_up_date" name="follow_up_date">
+        </div>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="exampleCheck1">
+          <label class="form-check-label" for="exampleCheck1">By creating new record I digitally append my signature.</label>
+        </div>
+        <div class="col-12 d-grid gap-2 mb-3 mt-3">
+          <button class="btn btn-success" type="submit">Create new record</button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+
+</div>
+{% endblock body %}

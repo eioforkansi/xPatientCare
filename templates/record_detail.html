@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Patient Record
+{% endblock title %}
+
+{% block body %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      {{message}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="container mt-3">
+  <div class="card">
+    <h5 class="card-header">Record ID {{record.id}} </h5>
+    <div class="card-body">
+      <a href="/records/patient/{{record.user_id}}" class="btn btn-primary">Back</a>
+      <div class="nav-item dropdown btn btn-secondary">
+        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          Options
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="/records/patient/update/{{record.id}}" class="dropdown-item">Update Record</a></li>
+          <li><a href="/documentations/new/create/{{record.id}} " class="dropdown-item">Add Documentaion</a></li>
+          <li><a href="/prescription/detail/{{record.id}}" class="dropdown-item">Add Prescription</a></li>
+        </ul>
+      </div>
+      <h5 class="card-title text-center">Confidential</h5>
+      <p class="card-text"><strong>Patient ID: </strong>{{record.user_id}}</p>
+      <p class="card-text"></p>
+      <p class="card-text"><strong>Date of visit: </strong>{{record.date_of_visit}}</p>
+      <p class="card-text"><strong>Review:</strong></p>
+      <p class="card-text">{{record.review}}</p>
+      <p class="card-text"><strong>Diagnosis:</strong></p>
+      <p class="card-text">{{record.diagnosis}}</p>
+      <p class="card-text"><strong>Plan:</strong></p>
+      <p class="card-text">{{record.plan}}</p>
+      <p class="card-text"><strong>Follow up date: </strong>{{record.date_of_visit}}</p>
+      <p class="card-text"><strong>Signed by: </strong>{{record.physician_name}}</p>
+      {% if documentations %}
+      <p class="card-text"><strong>Documentations: </strong></p>
+      <div class="table-responsive m-3">
+        <table class="table caption-top">
+          <thead>
+            <tr>
+              <th scope="col">SN</th>
+              <th scope="col">Professional</th>
+              <th scope="col">Date</th>
+              <th scope="col">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for documentation in documentations %}
+            <tr>
+              <th scope="row"> {{loop.index}} </th>
+              <td>{{documentation.documentation_by}}</td>
+              <td>{{documentation.created_at}}</td>
+              <td>
+                <a href=" /documentation/detail/{{documentation.id}}" class="btn btn-success">View</a>
+                <a href="/documentations/delete/{{documentation.id}}" class="btn btn-danger">Delete</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+      {% if medications %}
+      <p class="card-text"><strong>Prescription: </strong></p>
+      <div class="table-responsive m-3">
+        <table class="table caption-top">
+          <thead>
+            <tr>
+              <th scope="col">SN</th>
+              <th scope="col">Dosage form</th>
+              <th scope="col">Medication</th>
+              <th scope="col">Frequency</th>
+              <th scope="col">Duration</th>
+              <th scope="col">Prescribed by</th>
+              <th scope="col">Dispensed by</th>
+              {% if current_user.user_role == "Pharmacist"%}
+              <th scope="col">Action</th>
+              {% elif current_user.user_role == "Admin"%}
+              {% endif %}
+      
+            </tr>
+          </thead>
+          <tbody>
+
+            {% for medication in medications %}
+              <tr>
+                {% if medication.dispensed_by != "Pending"%}
+                  <th scope="row">{{loop.index}}</th>
+                  <td><s>{{medication.dosage_form}}</s></td>
+                  <td><s>{{medication.medication_name}}</s></td>
+                  <td><s>{{medication.frequency}}</s></td>
+                  <td><s>{{medication.duration}}</s></td>
+                  <td>{{medication.prescribed_by}}</td>
+                  <td>{{medication.dispensed_by}}</td> 
+                  {% if current_user.user_role == "Pharmacist"%}
+                  {% if medication.dispensed_by == current_user.title + " " + current_user.first_name + " " + current_user.last_name %}
+                  <td>Dispensed</td>
+                  {% else %}
+                  <td>Dispensed</td> 
+                  {% endif %}
+                  {% elif current_user.user_role == "Admin"%}
+
+                  {% endif %}
+                {% else %}
+                  <th scope="row">{{loop.index}}</th>
+                  <td>{{medication.dosage_form}}</td>
+                  <td>{{medication.medication_name}}</td>
+                  <td>{{medication.frequency}}</td>
+                  <td>{{medication.duration}}</td>
+                  <td>{{medication.prescribed_by}}</td>
+                  <td>{{medication.dispensed_by}}</td> 
+                  {% if current_user.user_role == "Pharmacist"%}
+                  <td><a href="/prescription/medication/dispense/{{medication.id}}" class="btn btn-success">Dispense</a></td>
+                  {% elif current_user.user_role == "Admin"%}
+
+                  {% endif %}
+                {% endif %}    
+              </tr>
+            {% endfor %}
+           
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+          
+    </div>
+  </div>
+</div>
+
+
+{% endblock body %}

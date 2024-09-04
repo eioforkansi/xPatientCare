@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Prescription
+{% endblock title %}
+
+{% block body %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      {{message}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="row m-3">
+  <div class="col-md-9 mb-3">
+    <div class="card">
+      <h5 class="card-header">Record No: {{record.id}}</h5>
+      <div class="card-body">
+        <a href="/record/detail/{{record.id}}" class="btn btn-primary">Back</a>
+
+        <div class=" table table-responsive m-3">
+          <table class="table caption-top">
+            <thead>
+              <tr>
+                <th scope="col">SN</th>
+                <th scope="col">Dosage form</th>
+                <th scope="col">Medication</th>
+                <th scope="col">Frequency</th>
+                <th scope="col">Duration</th>
+                <th scope="col">Prescribed by</th>
+                <th scope="col">Dispensed by</th>
+                <th scope="col">Action</th>
+        
+        
+              </tr>
+            </thead>
+            <tbody>
+              {% for medication in medications %}
+              <tr>
+                <th scope="row">{{loop.index}}</th>
+                <td>{{medication.dosage_form}}</td>
+                <td>{{medication.medication_name}}</td>
+                <td>{{medication.frequency}}</td>
+                <td>{{medication.duration}}</td>
+                <td>{{medication.prescribed_by}}</td>
+                <td>{{medication.dispensed_by}}</td>
+                <td><a href="/prescription/delete/medication/{{medication.id}}" class="btn btn-danger">Delete</a></td>
+        
+              </tr>
+              {% endfor %}
+             
+            </tbody>
+          </table>
+        </div>
+        
+        
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 ">
+    <h3 class="text-center text-bg-success rounded"><span class="badge">Add Medication</span></h3>
+    
+
+    <form action="/prescription/add/medication/{{record.id}}" method="POST">
+      <div class="mb-3">
+        <label for="record_id" class="form-label">Record No.</label>
+        <input type="text" class="form-control" id="record_id" name="record_id" placeholder="Record Number" value="{{record.id}}" required>
+      </div>
+      <div class="mb-3">
+        <label for="dosage_form" class="form-label">Dosage form</label>
+        <input type="text" class="form-control" id="dosage_form" name="dosage_form" placeholder="Dosage form" required>
+      </div>
+      <div class="mb-3">
+        <label for="medication_name" class="form-label">Medication name</label>
+        <input type="text" class="form-control" id="medication_name" name="medication_name" placeholder="Medication name" required>
+      </div>
+      <div class="mb-3">
+        <label for="frequency" class="form-label">Frequency</label>
+        <input type="text" class="form-control" id="frequency" name="frequency" placeholder="Frequency" required>
+      </div>
+      <div class="mb-3">
+        <label for="duration" class="form-label">Duration</label>
+        <input type="text" class="form-control" id="duration" name="duration" placeholder="Duration" required>
+      </div>
+      <div class="mb-3">
+        <label for="prescribed_by" class="form-label">Prescribed by</label>
+        <input type="text" class="form-control" id="prescribed_by" name="prescribed_by" placeholder="Prescribed by" value= "{{current_user.title}} {{current_user.first_name}} {{current_user.last_name}}" required>
+      </div>
+      <div class="d-grid gap-2">
+        <button class="btn btn-primary" type="submit">Add</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock body %}

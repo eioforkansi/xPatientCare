@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Appointments
+{% endblock title %}
+
+{% block body %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      {{message}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="table-responsive m-3">
+  <table class="table caption-top">
+    <thead>
+      <tr>
+        <th scope="col">SN</th>
+        <th scope="col">Patient No</th>
+        <th scope="col">Name</th>
+        <th scope="col">Date</th>
+        <th scope="col">Department</th>
+        <th scope="col">Status</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for booking in bookings %}
+      <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td scope="row">{{booking.patient_id}}</td>
+        <td> {{booking.first_name}} {{booking.last_name}} </td>
+        <td> {{booking.date}} </td>
+        <td> {{booking.department}} </td>
+        <td><p><i>{{booking.booking_status}}</i></p></td>
+        <td><a href="/booking/detail/view/{{booking.id}}"><button class="btn btn-primary" type="submit">View</button></a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock body %}

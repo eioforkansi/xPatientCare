@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Patient Records
+{% endblock title %}
+
+{% block body %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      {{message}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="card text-bg-light">
+  <h5 class="card-header">Patient Bio Data</h5>
+  <div class="card-body">
+    <h5 class="card-title">Patient ID: {{user.id}}</h5>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="card-text"><strong>First Name: </strong>{{user.first_name}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Middle Name: </strong>{{user.middle_name}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Last Name: </strong>{{user.last_name}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Title: </strong>{{user.title}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="card-text"><strong>Date of Birth: </strong>{{user.date_of_birth}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Gender: </strong>{{user.gender}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Contact Number: </strong>{{user.contact_number}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Email: </strong>{{user.email}}</p>
+      </div>
+
+    </div> 
+    <div class="row">
+      <div class="col-12">
+        <p class="card-text"><strong>Address: </strong>{{user.address}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="card-text"><strong>Emergency Contact Name: </strong>{{user.emergency_contact_name}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Emergency Contact No: </strong>{{user.emergency_contact_number}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Medical History: </strong>{{user.medical_history}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Allergies: </strong>{{user.allergies}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="card-text"><strong>Created: </strong>{{user.created_at}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Last Updated: </strong>{{user.updated_at}}</p>
+      </div>
+      <div class="col-md-3"></div>
+      <div class="col-md-3"></div>
+    </div>
+    <a href="/records/patient/biodata/update/{{id}}" class="btn btn-warning mt-3">Update bio data</a>
+    <a href="/records/new/create/{{id}}" class="btn btn-secondary mt-3">Create new record</a>
+  </div>
+</div>
+
+<div class="table-responsive m-3">
+  <table class="table caption-top">
+    <thead>
+      <tr>
+        <th scope="col">SN</th>
+        <th scope="col">Record No.</th>
+        <th scope="col">Date</th>
+        <th scope="col">Professional</th>
+        <th scope="col">Action</th>
+
+
+      </tr>
+    </thead>
+    <tbody>
+      {% for record in records %}
+      <tr>
+        <th scope="row">{{loop.index}}</th>
+        <td>{{record.id}}</td>
+        <td>{{record.date_of_visit}}</td>
+        <td>{{record.physician_name}}</td>
+        <td>
+          <a href="/record/detail/{{record.id}}"><button class="btn btn-primary" type="submit">View</button></a>
+          {% if current_user.title + " " + current_user.first_name + " " + current_user.last_name ==  record.physician_name %}
+          <a href="/records/patient/delete/{{record.id}}"><button class="btn btn-danger" type="submit">Delete</button></a>
+          {% endif %}
+          {% if current_user.user_role ==  "Admin" %}
+          <a href="/records/patient/delete/{{record.id}}"><button class="btn btn-danger" type="submit">Delete</button></a>
+          {% endif %}
+          </td>
+
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock body %}

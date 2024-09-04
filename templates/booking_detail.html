@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Records
+{% endblock title %}
+
+{% block body %}
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+      {{message}}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="card text-bg-light">
+  <h5 class="card-header">Booking Details</h5>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-3">
+        <h5 class="card-title">User ID: {{booking.user_id}}</h5>
+      </div>
+      <div class="col-3">
+        <small class="card-text"><span class="bg-warning rounded p-1">Booking Status</span> <i>{{booking.booking_status}}</i></small>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="card-text"><strong>Name: </strong>{{booking.title}} {{booking.first_name}} {{booking.middle_name}} {{booking.last_name}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Gender: </strong>{{booking.gender}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Email: </strong>{{booking.email}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Contact No: </strong>{{booking.number}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <p class="card-text"><strong>Address: </strong>{{booking.address}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="card-text"><strong>City: </strong>{{booking.city}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>State: </strong>{{booking.state}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Hospital: </strong>{{booking.hospital}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Department: </strong>{{booking.department}}</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-3">
+        <p class="card-text"><strong>Appointment Date: </strong>{{booking.date}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Appointment Time: </strong>{{booking.time}}</p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Created: </strong></p>
+      </div>
+      <div class="col-md-3">
+        <p class="card-text"><strong>Last Updated: </strong></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <p class="card-text"><strong>Reason: </strong>{{booking.reason}}</p>
+      </div>
+    </div>
+      <a href="/appointments" class="btn btn-primary text-center mt-3">Back</a>
+      <a href="/booking/edit/{{booking.id}}" class="btn btn-secondary text-center mt-3">Edit</a>
+      <a href="/booking/delete/{{booking.id}}" class="btn btn-danger text-center mt-3" onclick="return confirm('Are you sure to delete the booking?');">Delete</a>
+      <a href="/booking/schedule/{{booking.id}}"><button class="btn btn-success mt-3" type="button">Schedule</button></a>
+      <a href="/booking/cancel/{{booking.id}}"><button class="btn btn-danger mt-3" type="button">Cancel</button></a>
+  </div>
+</div>
+
+{% endblock body %}

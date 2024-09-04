@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}
+  Signup
+{% endblock title %}
+
+{% block body %}
+
+<div class="container mt-5">
+  <div class="row">
+
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+      <h5 class="text-center">Sign Up Here</h5>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+          {% for category, message in messages %}
+          <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+      {% endif %}
+    {% endwith %}
+      <form action="/signup" method="POST">
+        <div class="mb-3">
+          <label for="first_name" class="form-label">First Name</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" placeholder="Enter first name" required>
+        </div>
+        <div class="mb-3">
+          <label for="last_name" class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" placeholder="Enter last name" required>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email address</label>
+          <input type="email" class="form-control" id="email" name="email" placeholder="Enter email" required>
+          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+        </div>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="exampleCheck1">
+          <label class="form-check-label" for="exampleCheck1">By signing up I agree to the <a href="#">terms</a> and <a href="#">coditions</a> of xPatienctCare.</label>
+        </div>
+        <div class="d-grid gap-2">
+          <button class="btn btn-primary" type="submit">Sign up</button>
+        </div>
+      </form>
+      <br>
+      <div class="mb-3">Are you already a user? Login <a href="/login">here</a></div>
+    </div>
+    
+    </div>
+</div>
+
+
+
+{% endblock body %}
