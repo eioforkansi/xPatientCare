@@ -17,9 +17,7 @@
 {% endif %}
 {% endwith %}
 
-
-
-{% if all %}
+{% if bookings %}
 
 <div class="table-responsive m-3">
   <table class="table caption-top">
@@ -35,7 +33,8 @@
       </tr>
     </thead>
     <tbody>
-      {% for booking in all %}
+      {% for booking in bookings %}
+      {% if booking.user_id == current_user.id %}
       <tr>
         <th scope="row">{{loop.index}}</th>
         <td scope="row">{{booking.user_id}}</td>
@@ -45,12 +44,15 @@
         <td><p><i>{{booking.booking_status}}</i></p></td>
         <td><a href="/booking/detail/view/{{booking.id}}"><button class="btn btn-primary" type="submit">View</button></a></td>
       </tr>
+      {% endif %}
       {% endfor %}
     </tbody>
   </table>
 </div>
+
 {% else %}
-<h3 class="text-center p-5 m-5" style="font-family: Open Sans, sans-serif;"><i>No appointments</i></h3>
+<h3 class="text-center p-5 m-5" style="font-family: Open Sans, sans-serif;"><i>No bookings</i></h3>
 {% endif %}
+
 
 {% endblock body %}

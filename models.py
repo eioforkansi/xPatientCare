@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     middle_name = db.Column(db.String(50) , default="")
     last_name = db.Column(db.String(50), default="")
     user_role = db.Column(db.String(50), default="Patient")
+    specialty = db.Column(db.String(50), default="")
     date_of_birth = db.Column(db.String(10), default="")
     gender = db.Column(db.String(10), default="")
     contact_number = db.Column(db.String(15), default="")
@@ -25,7 +26,7 @@ class User(UserMixin, db.Model):
     updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())  
     
 
-class Bookings(UserMixin, db.Model):
+class Bookings(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     title = db.Column(db.String(80), nullable=False)
     first_name = db.Column(db.String(80), nullable=False)
@@ -36,10 +37,7 @@ class Bookings(UserMixin, db.Model):
     email = db.Column(db.String(80), nullable=False)
     number = db.Column(db.String(80), nullable=False)
     address = db.Column(db.String(80), nullable=False)
-    city = db.Column(db.String(80), nullable=False)
-    state = db.Column(db.String(80), nullable=False)
-    hospital = db.Column(db.String(80), nullable=False)
-    department = db.Column(db.String(80), nullable=False)
+    specialty = db.Column(db.String(80), nullable=False)
     date = db.Column(db.String(80), nullable=False)
     time = db.Column(db.String(80), nullable=False)
     reason = db.Column(db.String(1000), nullable=False)

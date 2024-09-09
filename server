@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Bookings, Records, Medications, Documentations
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/eioforkansi/workshop/databases/xPatientCare.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////home/eioforkansi/xPatientCare/databases/xPatientCare.db'
 app.secret_key = 'xpatientcare'
 
 # Unique user access
@@ -36,10 +36,9 @@ def unauthorized_user():
 def home():
     return render_template('home.html')
 
-@app.route("/professionals")
-@login_required
+@app.route("/specialty")
 def professionals():
-    return render_template('professionals.html')
+    return render_template('specialty.html')
 
 @app.route("/profile/<int:user_id>")
 @login_required
@@ -77,6 +76,7 @@ def role_update(user_id):
     if request.method == "POST":
         user.title = request.form["title"]
         user.user_role = request.form["user_role"]
+        user.specialty = request.form["specialty"]
         authorization_code = request.form.get('authorization_code')
         user=User.query.get(user_id)
         if user and authorization_code == "0000":
@@ -100,21 +100,18 @@ def bookings():
         gender = request.form.get("gender")
         user_id = request.form.get("user_id")
         address = request.form.get("address")
-        city = request.form.get("city")
-        state = request.form.get("state")
-        hospital = request.form.get("hospital")
-        department = request.form.get("department")
+        specialty = request.form.get("specialty")
         date = request.form.get("date")
         time = request.form.get("time")
         reason = request.form.get("reason")
         booking_status = request.form.get("booking_status")
-        new_booking = Bookings(title=title, first_name=first_name, middle_name=middle_name, last_name=last_name,
-                               email=email, number=number, gender=gender, user_id=user_id, address=address, city=city, state=state, hospital=hospital,
-                               department=department, date=date, time=time, reason=reason, booking_status=booking_status)
+        new_booking = Bookings(title=title, first_name=first_name, middle_name=middle_name, last_name=last_name, specialty=specialty,
+                               email=email, number=number, gender=gender, user_id=user_id, address=address,
+                               date=date, time=time, reason=reason, booking_status=booking_status)
         db.session.add(new_booking)
         db.session.commit()
         flash("Booking successful", "success")
-        return redirect(url_for('bookings'))
+        return redirect(url_for('mybookings'))
         
     return render_template('bookings.html')
 
@@ -206,18 +203,28 @@ def delete_documentations(id):
 @app.route("/documentation/detail/<int:id>")
 @login_required
 def documentation_detail(id):
-    
     documentation = Documentations.query.get(id)
-    print("Working...")
     return render_template('documentation_detail.html',  documentation=documentation)
 
+@app.route("/documentation/update/<int:id>", methods=['GET', 'POST'])
+@login_required
+def documentation_update(id):
+    documentation = Documentations.query.get(id)
+    if request.method == "POST":
+        print("Working...")
+    return render_template('update_documentation.html',  documentation=documentation) 
+
+@app.route("/mybookings")
+@login_required
+def mybookings():
+    bookings = Bookings.query.filter_by(user_id=current_user.id).all()
+    return render_template('mybookings.html', bookings=bookings)
 
 @app.route("/appointments")
 @login_required
 def appointments():
-    # bookings = Bookings.query.filter_by(email=current_user.email).all()
-    bookings = Bookings.query.all()
-    return render_template('appointments.html', bookings=bookings)
+    all_bookings = Bookings.query.filter_by(specialty=current_user.specialty).all()
+    return render_template('appointments.html', bookings=bookings, all=all_bookings)
 
 @app.route("/records/query", methods=['POST', 'GET'])
 @login_required

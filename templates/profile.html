@@ -72,12 +72,14 @@
         <p class="card-text"><strong>Role: </strong>{{user.user_role}}</p>
       </div>
       <div class="col-md-3">
+        <p class="card-text"><strong>Specialty: </strong>{{user.specialty}}</p>
+      </div>
+      <div class="col-md-3">
         <p class="card-text"><strong>Created: </strong>{{user.created_at}}</p>
       </div>
       <div class="col-md-3">
         <p class="card-text"><strong>Last Updated: </strong>{{user.updated_at}}</p>
       </div>
-      <div class="col-md-3"></div>
     </div>
     <a href="/profile/update/{{user.id}}" class="btn btn-success mt-3">Update profile</a>
     <a href="/profile/update/role/{{user.id}}" class="btn btn-primary mt-3">Become a professional</a>

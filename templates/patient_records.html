@@ -84,6 +84,8 @@
   </div>
 </div>
 
+{% if records %}
+
 <div class="table-responsive m-3">
   <table class="table caption-top">
     <thead>
@@ -93,8 +95,6 @@
         <th scope="col">Date</th>
         <th scope="col">Professional</th>
         <th scope="col">Action</th>
-
-
       </tr>
     </thead>
     <tbody>
@@ -119,5 +119,10 @@
     </tbody>
   </table>
 </div>
+
+{% else %}
+<h3 class="text-center p-5 m-5" style="font-family: Open Sans, sans-serif;"><i>No records</i></h3>
+{% endif %}
+
 
 {% endblock body %}

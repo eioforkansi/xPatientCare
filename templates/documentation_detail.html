@@ -21,12 +21,13 @@
   <div class="card">
     <h5 class="card-header">Record ID {{documentation.record_id}} </h5>
     <div class="card-body">
-      <a href="/prescription/query " class="btn btn-primary">Back</a>
+      <a href="/record/detail/{{documentation.record_id}}" class="btn btn-primary">Back</a>
+      <a href="/documentation/update/{{documentation.id}}" class="btn btn-success">Update</a>
 
       <h5 class="card-title text-center">Confidential</h5>
-      <p class="card-text"><strong>Patient ID: </strong> </p>
-
-      <p class="card-text"><strong>Signed by: </strong> </p>
+      <p class="card-text"><strong>Documentation:</strong> </p>
+      <p class="card-text">{{documentation.documentation}}</p>
+      <p class="card-text"><strong>Signed by: </strong>{{documentation.documentation_by}}</p>
       
     </div>
   </div>
