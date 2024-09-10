@@ -1,9 +1,0 @@
-.custom-carousel-img {
-    height: 600px; /* Adjust this value to your preferred height */
-    object-fit: cover; /* Ensures the image fills the height without distortion */
-  }
-
-  .carousel-caption h1 {
-    font-family: Open Sans, sans-serif;
-
-  }
