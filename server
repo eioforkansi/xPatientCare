@@ -281,7 +281,7 @@ def biodata_update(user_id):
         user.allergies = request.form["allergies"]
         db.session.commit()
         flash("Patient Bio Data updated successfully", "success")
-        return redirect(url_for('patient_records', user_id=user_id))
+        return redirect(url_for('patient_records', id=user_id))
     return render_template('biodata_update.html', user=user)
 
 @app.route("/records/patient/update/<int:record_id>", methods=['POST', 'GET'])

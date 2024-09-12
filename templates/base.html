@@ -29,9 +29,9 @@
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/home">Home</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="/specialty">Specialty</a>
-            </li>
+            </li> -->
             <li class="nav-item">
               <a class="nav-link" href="/bookings">Book Appointment</a>
             </li>
@@ -41,9 +41,9 @@
             <li class="nav-item">
               <a class="nav-link" href="/records/patient/{{current_user.id}}">myRecords</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="/appointments">Appointments</a>
-            </li>
+            </li> -->
             {% if current_user.user_role == "Pharmacist"%}
             
             <li class="nav-item">
@@ -54,9 +54,9 @@
               <a class="nav-link" aria-current="page" href="/prescription/query">Prescription</a>
             </li>
             {% endif %}
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="/records/query">Records</a>
-            </li>
+            </li> -->
             {% if current_user.is_authenticated %}
             
             <li class="nav-item dropdown">
